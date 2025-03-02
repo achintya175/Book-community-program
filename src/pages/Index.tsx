@@ -118,7 +118,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-serif font-medium mb-4">Bookish</h3>
+              <h3 className="text-xl font-serif font-medium mb-4">Swing Page</h3>
               <p className="text-white/80 text-sm">
                 Your trusted source for books across all genres, formats, and interests.
               </p>
@@ -155,7 +155,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60 text-sm">
-            <p>© 2023 Bookish. All rights reserved.</p>
+            <p>© 2023 Swing Page. All rights reserved.</p>
           </div>
         </div>
       </footer>
