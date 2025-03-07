@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { toast } from "sonner";
 import { Book } from '@/utils/types';
 import { cn } from '@/lib/utils';
 
@@ -16,11 +17,44 @@ export const BookCard: React.FC<BookCardProps> = ({
   featured = false,
   className 
 }) => {
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
+  };
+
+  const addToWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
+    
+    if (!isWishlisted) {
+      toast.success(`${book.title} added to your wishlist`, {
+        description: "You can view your wishlist anytime",
+        action: {
+          label: "View Wishlist",
+          onClick: () => navigate("/wishlist")
+        },
+      });
+    } else {
+      toast.info(`${book.title} removed from your wishlist`);
+    }
+  };
+
+  const addToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    toast.success(`${book.title} added to your cart`, {
+      description: "You can checkout anytime",
+      action: {
+        label: "View Cart",
+        onClick: () => navigate("/cart")
+      },
+    });
   };
 
   return (
@@ -59,16 +93,23 @@ export const BookCard: React.FC<BookCardProps> = ({
         )}>
           <div className="flex gap-2">
             <button 
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center transition-transform duration-300 hover:bg-accent hover:text-white transform hover:scale-105"
-              title="Add to wishlist"
-              aria-label="Add to wishlist"
+              className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 transform hover:scale-105",
+                isWishlisted 
+                  ? "bg-accent text-white hover:bg-accent/90" 
+                  : "bg-white hover:bg-accent hover:text-white"
+              )}
+              title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={addToWishlist}
             >
-              <Heart className="w-5 h-5" />
+              <Heart className={cn("w-5 h-5", isWishlisted && "fill-current")} />
             </button>
             <button 
               className="w-10 h-10 rounded-full bg-white flex items-center justify-center transition-transform duration-300 hover:bg-accent hover:text-white transform hover:scale-105"
               title="Add to cart"
               aria-label="Add to cart"
+              onClick={addToCart}
             >
               <ShoppingCart className="w-5 h-5" />
             </button>

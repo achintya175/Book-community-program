@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Trash2, ShoppingCart, ArrowRight, X } from 'lucide-react';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/utils/types';
@@ -15,11 +16,13 @@ const initialCartItems: CartItem[] = [
 ];
 
 export const Cart: React.FC = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
   const [loading, setLoading] = useState(false);
 
   const removeItem = (id: string) => {
     setCartItems(prevItems => prevItems.filter(item => item.book.id !== id));
+    toast.success("Item removed from cart");
   };
 
   const updateQuantity = (id: string, newQuantity: number) => {
@@ -29,6 +32,7 @@ export const Cart: React.FC = () => {
         item.book.id === id ? { ...item, quantity: newQuantity } : item
       )
     );
+    toast.success("Cart updated");
   };
 
   const subtotal = cartItems.reduce(
@@ -45,7 +49,10 @@ export const Cart: React.FC = () => {
     // Simulate checkout process
     setTimeout(() => {
       setLoading(false);
-      alert('Checkout functionality would go here!');
+      toast.success("Order placed successfully!", {
+        description: "Thank you for your purchase",
+      });
+      setCartItems([]);
     }, 1500);
   };
 
@@ -64,7 +71,7 @@ export const Cart: React.FC = () => {
               Looks like you haven't added any books to your cart yet.
             </p>
             <Button asChild>
-              <Link to="/">Continue Shopping</Link>
+              <Link to="/books">Continue Shopping</Link>
             </Button>
           </div>
         </div>
@@ -88,13 +95,15 @@ export const Cart: React.FC = () => {
                   <div key={item.book.id} className="mb-6 last:mb-0">
                     <div className="flex flex-col sm:flex-row gap-4">
                       <div className="w-full sm:w-1/4">
-                        <div className="aspect-[2/3] rounded-md overflow-hidden">
-                          <img 
-                            src={item.book.coverImage} 
-                            alt={item.book.title}
-                            className="w-full h-full object-cover" 
-                          />
-                        </div>
+                        <Link to={`/books/${item.book.id}`}>
+                          <div className="aspect-[2/3] rounded-md overflow-hidden">
+                            <img 
+                              src={item.book.coverImage} 
+                              alt={item.book.title}
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                        </Link>
                       </div>
                       
                       <div className="flex-1">
@@ -207,7 +216,7 @@ export const Cart: React.FC = () => {
                 </Button>
                 
                 <Button variant="outline" asChild className="w-full">
-                  <Link to="/">Continue Shopping</Link>
+                  <Link to="/books">Continue Shopping</Link>
                 </Button>
               </div>
             </div>

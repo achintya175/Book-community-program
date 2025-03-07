@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -12,7 +13,27 @@ import { AuthView } from '@/utils/types';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
+  const navigate = useNavigate();
   const featuredBooks = getFeaturedBooks();
+  const [email, setEmail] = useState('');
+  
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim() === '') {
+      toast.error("Please enter your email address");
+      return;
+    }
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
+    toast.success("Thanks for subscribing!", {
+      description: "You'll now receive our newsletter"
+    });
+    setEmail('');
+  };
   
   return (
     <div className="min-h-screen">
@@ -81,14 +102,16 @@ const Index = () => {
               Sign up for our newsletter to receive book recommendations, exclusive offers, and updates on new releases.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <input
                 type="email"
                 placeholder="Your email address"
                 className="flex-1 px-4 py-2 rounded-md border border-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <Button>Subscribe</Button>
-            </div>
+              <Button type="submit">Subscribe</Button>
+            </form>
           </div>
         </section>
         
@@ -137,8 +160,8 @@ const Index = () => {
             <div>
               <h4 className="font-medium mb-4">Account</h4>
               <ul className="space-y-2">
-                <li><Link to="/account" className="text-white/80 hover:text-white transition-colors">My Account</Link></li>
-                <li><Link to="/orders" className="text-white/80 hover:text-white transition-colors">Orders</Link></li>
+                <li><button onClick={() => toast.info("Account functionality coming soon!")} className="text-white/80 hover:text-white transition-colors">My Account</button></li>
+                <li><button onClick={() => toast.info("Orders functionality coming soon!")} className="text-white/80 hover:text-white transition-colors">Orders</button></li>
                 <li><Link to="/wishlist" className="text-white/80 hover:text-white transition-colors">Wishlist</Link></li>
               </ul>
             </div>
@@ -146,10 +169,10 @@ const Index = () => {
             <div>
               <h4 className="font-medium mb-4">About</h4>
               <ul className="space-y-2">
-                <li><Link to="/about" className="text-white/80 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to="/contact" className="text-white/80 hover:text-white transition-colors">Contact</Link></li>
-                <li><Link to="/faq" className="text-white/80 hover:text-white transition-colors">FAQ</Link></li>
-                <li><Link to="/privacy" className="text-white/80 hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><button onClick={() => toast.info("About page coming soon!")} className="text-white/80 hover:text-white transition-colors">About Us</button></li>
+                <li><button onClick={() => toast.info("Contact page coming soon!")} className="text-white/80 hover:text-white transition-colors">Contact</button></li>
+                <li><button onClick={() => toast.info("FAQ page coming soon!")} className="text-white/80 hover:text-white transition-colors">FAQ</button></li>
+                <li><button onClick={() => toast.info("Privacy policy coming soon!")} className="text-white/80 hover:text-white transition-colors">Privacy Policy</button></li>
               </ul>
             </div>
           </div>

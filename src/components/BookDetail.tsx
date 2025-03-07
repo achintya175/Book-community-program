@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, ShoppingCart, Heart, Share2, 
   Star, Calendar, Book as BookIcon, Hash, BadgeCheck 
 } from 'lucide-react';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { getBookById, sampleReviews } from '@/utils/bookData';
@@ -17,11 +17,13 @@ interface BookDetailParams {
 
 export const BookDetail: React.FC = () => {
   const { id } = useParams<keyof BookDetailParams>() as BookDetailParams;
+  const navigate = useNavigate();
   const [book, setBook] = useState<Book | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [loading, setLoading] = useState(true);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     // Simulate fetching book data
@@ -52,13 +54,43 @@ export const BookDetail: React.FC = () => {
   };
 
   const addToCart = () => {
-    console.log(`Added ${quantity} copies of "${book?.title}" to cart`);
-    // Implement cart functionality
+    if (!book) return;
+    
+    toast.success(`${quantity} ${quantity === 1 ? 'copy' : 'copies'} of "${book.title}" added to cart`, {
+      description: "You can checkout anytime",
+      action: {
+        label: "View Cart",
+        onClick: () => navigate("/cart")
+      },
+    });
   };
 
   const addToWishlist = () => {
-    console.log(`Added "${book?.title}" to wishlist`);
-    // Implement wishlist functionality
+    if (!book) return;
+    
+    setIsWishlisted(!isWishlisted);
+    
+    if (!isWishlisted) {
+      toast.success(`"${book.title}" added to your wishlist`, {
+        description: "You can view your wishlist anytime",
+        action: {
+          label: "View Wishlist",
+          onClick: () => navigate("/wishlist")
+        },
+      });
+    } else {
+      toast.info(`"${book.title}" removed from your wishlist`);
+    }
+  };
+
+  const handleShare = () => {
+    if (!book) return;
+    
+    // In a real app, this would use the Web Share API if available
+    // For now, we'll just simulate with a toast
+    toast.info(`Share link for "${book.title}" copied to clipboard`, {
+      description: "You can now share this book with others"
+    });
   };
 
   if (loading) {
@@ -108,7 +140,7 @@ export const BookDetail: React.FC = () => {
         {/* Breadcrumb */}
         <div className="mb-8">
           <Link 
-            to="/" 
+            to="/books" 
             className="flex items-center text-sm text-muted-foreground hover:text-accent transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -142,12 +174,13 @@ export const BookDetail: React.FC = () => {
           <div className="w-full md:w-2/3 lg:w-3/4">
             <div className="mb-6">
               {book.genre.map((genre, index) => (
-                <span 
+                <Link 
                   key={index} 
-                  className="inline-block text-xs font-medium bg-secondary py-1 px-2 rounded mr-2 mb-2"
+                  to={`/categories/${genre.toLowerCase()}`}
+                  className="inline-block text-xs font-medium bg-secondary py-1 px-2 rounded mr-2 mb-2 hover:bg-secondary/80 transition-colors"
                 >
                   {genre}
-                </span>
+                </Link>
               ))}
             </div>
 
@@ -215,12 +248,18 @@ export const BookDetail: React.FC = () => {
               <Button 
                 variant="outline" 
                 onClick={addToWishlist}
+                className={cn(
+                  isWishlisted && "bg-accent text-white hover:bg-accent/90 border-accent"
+                )}
               >
-                <Heart className="mr-2 h-4 w-4" />
-                Wishlist
+                <Heart className={cn("mr-2 h-4 w-4", isWishlisted && "fill-current")} />
+                {isWishlisted ? "Wishlisted" : "Wishlist"}
               </Button>
 
-              <Button variant="ghost">
+              <Button 
+                variant="ghost"
+                onClick={handleShare}
+              >
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>

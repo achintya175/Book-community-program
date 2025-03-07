@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Heart, Menu, X, User } from 'lucide-react';
+import { toast } from "sonner";
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +20,7 @@ const navLinks: NavLink[] = [
 
 export const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
@@ -41,10 +43,17 @@ export const Header = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality
-    console.log(`Searching for: ${searchInput}`);
-    setSearchInput('');
-    setSearchVisible(false);
+    
+    if (searchInput.trim()) {
+      // In a real app, we would navigate to a search results page with the query
+      // For now, let's navigate to the books page and show a toast
+      toast.info(`Searching for: ${searchInput}`);
+      navigate('/books');
+      setSearchInput('');
+      setSearchVisible(false);
+    } else {
+      toast.error("Please enter a search term");
+    }
   };
 
   const toggleMobileMenu = () => {
@@ -79,7 +88,7 @@ export const Header = () => {
             to="/" 
             className="text-2xl font-serif font-bold transition-opacity hover:opacity-80"
           >
-            Bookish
+            Swing Page
           </Link>
 
           {/* Desktop Navigation */}
@@ -112,26 +121,35 @@ export const Header = () => {
             
             <Link 
               to="/wishlist"
-              className="p-2 rounded-full transition-colors hover:bg-secondary"
+              className="p-2 rounded-full transition-colors hover:bg-secondary relative"
               aria-label="Wishlist"
             >
               <Heart className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                0
+              </span>
             </Link>
             
             <Link 
               to="/cart"
-              className="p-2 rounded-full transition-colors hover:bg-secondary"
+              className="p-2 rounded-full transition-colors hover:bg-secondary relative"
               aria-label="Cart"
             >
               <ShoppingCart className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 bg-accent text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                0
+              </span>
             </Link>
             
-            <Link to="/account">
-              <Button variant="outline" size="sm" className="hidden md:flex items-center gap-2">
-                <User className="w-4 h-4" />
-                <span>Account</span>
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden md:flex items-center gap-2"
+              onClick={() => toast.info("Account functionality coming soon!")}
+            >
+              <User className="w-4 h-4" />
+              <span>Account</span>
+            </Button>
 
             {/* Mobile Menu Toggle */}
             <button
@@ -192,12 +210,15 @@ export const Header = () => {
                 {link.text}
               </Link>
             ))}
-            <Link 
-              to="/account"
+            <button 
               className="font-medium transition-colors hover:text-accent"
+              onClick={() => {
+                toast.info("Account functionality coming soon!");
+                setMobileMenuOpen(false);
+              }}
             >
               Account
-            </Link>
+            </button>
             <div className="pt-6 flex space-x-4">
               <Link 
                 to="/wishlist"
